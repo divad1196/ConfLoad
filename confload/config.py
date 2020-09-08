@@ -2,7 +2,8 @@ import json
 import yaml
 import requests
 from pathlib import Path
-from .tools import file_from_env, recursive_dict_merge, ini_file_to_dict
+from .tools import recursive_dict_merge, ini_file_to_dict
+from .env import EnvProxy, file_from_env
 from copy import deepcopy
 
 VALIDES_CONFIG_STRATS = [
@@ -17,10 +18,18 @@ def _validate_strat(strat):
         return strat
     return DEFAULT_CONFIG_STRAT
 
+
 class Config:
     def __init__(self, values={}, strat=DEFAULT_CONFIG_STRAT):
         self._values = values
         self._strat = _validate_strat(strat)
+        self.env = EnvProxy(self)
+
+    def __str__(self):
+        return str(self._values)
+
+    def __repr__(self):
+        return repr(self._values)
 
     def __getitem__(self, key):
         if key in self._values:
@@ -31,12 +40,6 @@ class Config:
         if isinstance(value, dict):
             return Config(value)
         return value
-
-    def __str__(self):
-        return str(self._values)
-
-    def __repr__(self):
-        return repr(self._values)
 
     def __setitem__(self, key, value):
         self._values[key] = value
@@ -154,34 +157,34 @@ class Config:
         return self
 
     # From env
-    def env(self, env):
-        """
-            Load the file represented by the given environment variable.
-            The format is guessed by using the file suffix
-        """
-        fd = file_from_env(env)
-        return self.load(fd)
+    # def env(self, env):
+    #     """
+    #         Load the file represented by the given environment variable.
+    #         The format is guessed by using the file suffix
+    #     """
+    #     fd = file_from_env(env)
+    #     return self.load(fd)
 
-    def env_json(self, env):
-        """
-            Load the json file represented by the given environment variable
-        """
-        fd = file_from_env(env)
-        return self.load_json(file)
+    # def env_json(self, env):
+    #     """
+    #         Load the json file represented by the given environment variable
+    #     """
+    #     fd = file_from_env(env)
+    #     return self.load_json(file)
 
-    def env_yaml(self, env):
-        """
-            Load the yaml file represented by the given environment variable
-        """
-        fd = file_from_env(env)
-        return self.load_json(file)
+    # def env_yaml(self, env):
+    #     """
+    #         Load the yaml file represented by the given environment variable
+    #     """
+    #     fd = file_from_env(env)
+    #     return self.load_json(file)
 
-    def env_ini(self, env):
-        """
-            Load the ini file represented by the given environment variable
-        """
-        fd = file_from_env(env)
-        return self.load_ini(file)
+    # def env_ini(self, env):
+    #     """
+    #         Load the ini file represented by the given environment variable
+    #     """
+    #     fd = file_from_env(env)
+    #     return self.load_ini(file)
 
     # From http
     def request_json(self, *args, **kwargs):
@@ -210,7 +213,6 @@ class Config:
         response = requests.get(*args, **kwargs)
         data = ini_string_to_dict(response.text)
         return self.update(data)
-
 
     # Dump to file
     def dump_json(self, file):

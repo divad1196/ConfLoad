@@ -8,18 +8,6 @@ try:
 except ImportError:
     from ConfigParser import ConfigParser  # ver. < 3.0
 
-# def get_env(var, default=None, type=str):
-#     val = os.environ.get(var)
-#     if val is None:
-#         return default
-#     return type(val)
-
-def file_from_env(var):
-    value = os.environ.get(var)
-    if value is not None:
-        return Path(value).resolve()
-    return value
-
 def recursive_dict_merge(src, dest):
     for key, value in src.items():
         if not isinstance(value, dict) or key not in dest:

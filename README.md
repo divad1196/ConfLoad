@@ -57,8 +57,21 @@ cfg["abcd"].update(test4={"test3": 5})  # use the strategy defined on cfg build
 cfg.request_json("my_site.com/config.json")
 
 # Or from your env
-cfg.env_json("MY_JSON_FILE")  # Precise the format
+cfg.env.json("MY_JSON_FILE")  # Precise the format
 cfg.env("MY_INI_FILE")  # or let it guess using the file suffix
+
+# you can also retrieve vars from env
+cfg.env.string("MY_VAR", default="not found", name="myvar")  # you can give the name to use in the config (default take env var name)
+
+# cfg.env.int, cfg.env.float also exists
+cfg.env.bool(...)  # Value are case INsensitive tested.
+                   # True value are "on", "True" or any non nulle number
+                   # False value are "off", "False" or 0
+        
+# we can get a list too
+cfg.list(...)
+# and cast the result
+cfg.list[int](...)  #  the value "1,2,3" becomes [1, 2, 3] and not ["1", "2", "3"]
 
 cfg.dump_json("myfile.json")  # can be yaml but not ini file
 ```
@@ -74,5 +87,4 @@ cfg = Config(...).update(...).env(...).load(...)
 ## Futur
 
 * add support for argparse
-* add support for environment variables that are not files (e.g.: MY_CUSTOM_PORT=80)
 * documentation will be done, some change may appear as well.
