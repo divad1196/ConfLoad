@@ -28,10 +28,18 @@ class Argument:
             aliases = [name]
         self.aliases = [ _make_option(alias) for alias in aliases]
         self.schema = Schema(schema)
+        self.default = default
 
-    def __call__(self, values, alias, cursor):
-        text = next(cursor)
-        values[self.name] = self.schema.validate(text)
+    def __call__(self, values, val):
+        values[self.name] = self.schema.validate(val)
+
+    def __repr__(self):
+        return self.name
+
+class String(Argument):
+    def __init__(self, *args, **kwargs):
+        kwargs["schema"] = str
+        super().__init__(*args, **kwargs)
 
 class Int(Argument):
     def __init__(self, *args, **kwargs):
@@ -49,20 +57,19 @@ class Float(Argument):
 # use 2 differents aliases, one for each value
 # Make one classe for each?
 class Bool(Argument):
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         kwargs["schema"] = schema.Bool
-        super().__init__(**kwargs)
+        super().__init__(*args, **kwargs)
 
 class List(Argument):
-    def __init__(self, **kwargs):
-        kwargs["schema"] = schema.List
-        super().__init__(**kwargs)
+    def __init__(self, *args, **kwargs):
+        kwargs["schema"] = schema.Split()
+        super().__init__(*args, **kwargs)
 
-    def __call__(self, values, alias, cursor):
-        text = next(cursor)
+    def __call__(self, values, val):
         if self.name not in values:
             values[self.name] = []
-        values[self.name] += self.schema.validate(text)
+        values[self.name] += self.schema.validate(val)
 
 class SubParser:
     def __init__(self, **kwargs):
@@ -116,6 +123,9 @@ class Parser:
         positional = args[-nb_positional:]
         optionals = args[:-nb_positional]
 
+        if len(positional) != nb_positional:
+            raise Exception("Missing positional arguments")
+
         for i in range(nb_positional):
             value = positional[i]
             arg = self._args[i]
@@ -127,7 +137,8 @@ class Parser:
                 raise Exception("Unknown alias {name}".format(
                     name=opt,
                 ))
-            self.aliases[opt](values, opt, options)
+            value = next(options)
+            self.aliases[opt](values, value)
 
         defaults.update(values)
         return defaults
