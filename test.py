@@ -10,3 +10,7 @@ cfg.env.int("dga")
 
 os.environ["top"] = "54, 76"
 cfg.env.list("top")
+
+
+os.environ["top"] = "54, 76"
+cfg.env.list[int]("top")

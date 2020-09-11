@@ -28,7 +28,7 @@ def Float(data):
 
 
 class List:
-    def __init__(self, callable_):
+    def __init__(self, callable_=str):
         self._callable = callable_
 
     def __getitem__(self, callable_):
