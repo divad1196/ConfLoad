@@ -22,13 +22,14 @@ def _get_program_name():
 
 
 class Argument:
-    def __init__(self, name, aliases=None, default=_sentinelle, schema=str):
+    def __init__(self, name, aliases=None, default=_sentinelle, schema=str, need_value=True):
         self.name = name
         if aliases is None:
             aliases = [name]
         self.aliases = [ _make_option(alias) for alias in aliases]
         self.schema = Schema(schema)
         self.default = default
+        self.need_value = need_value
 
     def __call__(self, values, val):
         values[self.name] = self.schema.validate(val)
@@ -57,9 +58,35 @@ class Float(Argument):
 # use 2 differents aliases, one for each value
 # Make one classe for each?
 class Bool(Argument):
+    """
+        Boolean value only meant to be used as option without value.
+        Default value is mandatory (either True or False).
+        Using the options toggle the default value
+    """
     def __init__(self, *args, **kwargs):
         kwargs["schema"] = schema.Bool
         super().__init__(*args, **kwargs)
+
+class Toggle(Argument):
+    """
+        Boolean value only meant to be used as option without value.
+        Default value is mandatory (either True or False).
+        Using the options toggle the default value
+    """
+    def __init__(self, *args, default=False, **kwargs):
+        if default not in [True, False]:
+            raise Exception("Default Value must be either True or False")
+        kwargs["schema"] = schema.Bool
+        kwargs["need_value"] = False
+        kwargs["default"] = default
+        super().__init__(*args, **kwargs)
+
+    def __call__(self, values, val):
+        """
+            Parameter 'val' is ignored.
+            Set the option has the invert of default value.
+        """
+        values[self.name] = not self.default
 
 class List(Argument):
     def __init__(self, *args, **kwargs):
@@ -127,9 +154,9 @@ class Parser:
             raise Exception("Missing positional arguments")
 
         for i in range(nb_positional):
-            value = positional[i]
+            val = positional[i]
             arg = self._args[i]
-            arg(values, value)
+            arg(values, val)
 
         options = iter(optionals)
         for opt in options:
@@ -137,8 +164,12 @@ class Parser:
                 raise Exception("Unknown alias {name}".format(
                     name=opt,
                 ))
-            value = next(options)
-            self.aliases[opt](values, value)
+            alias = self.aliases[opt]
+
+            val = None
+            if alias.need_value:
+                val = next(options)
+            alias(values, val)
 
         defaults.update(values)
         return defaults

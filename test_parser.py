@@ -1,4 +1,4 @@
-from confload.cli import Parser, SubParser, String, Int, Float, Bool, List
+from confload.cli import Parser, SubParser, String, Int, Float, Bool, Toggle, List
 
 
 parser = Parser(
@@ -8,6 +8,7 @@ parser = Parser(
     [
         String("lastname", aliases=["lastname", "l"]),
         List("children", aliases=["child", "c"]),
+        Toggle("active", aliases=["active", "y"], default=False),
     ],
 )
 
