@@ -121,7 +121,6 @@ class SubParser:
             ))
         return parser(args)
 
-
 class Parser:
     def __init__(self, args=[], options=[], name=None):
         if name is None:
@@ -169,7 +168,11 @@ class Parser:
 
             val = None
             if alias.need_value:
-                val = next(options)
+                val = next(options, None)
+                if val is None:
+                    raise Exception("Missing value after alias {alias}".format(
+                        alias=opt,
+                    ))
             alias(values, val)
 
         defaults.update(values)
