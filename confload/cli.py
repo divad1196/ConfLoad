@@ -146,6 +146,7 @@ class Parser:
         defaults = self._default_prefilled_values()
         values = {}
 
+        # TODO: do not split positional at first, only handle them when no more option is found
         nb_positional = len(self._args)
         positional = args[-nb_positional:]
         optionals = args[:-nb_positional]

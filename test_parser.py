@@ -2,9 +2,12 @@ from confload.cli import Parser, SubParser, String, Int, Float, Bool, Toggle, Li
 
 
 parser = Parser(
+    # Positional values
     [
         String("name"),
     ],
+
+    # Optional values
     [
         String("lastname", aliases=["lastname", "l"]),
         List("children", aliases=["child", "c"]),
