@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name='confload',
-    version='0.2',
+    version='0.3',
     author="Gallay David",
     author_email="davidtennis96@hotmail.com",
     description="A tool to handle configuration",

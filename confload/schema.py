@@ -11,6 +11,9 @@ def HasKey(key):
 BOOLEAN_TRUE = ["true", "on"]
 BOOLEAN_FALSE = ["false", "off"]
 
+def String(data):
+    return Use(str).validate(data)
+
 def Bool(data):
     if isinstance(data, str):
         data = data.strip().lower()

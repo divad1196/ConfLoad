@@ -5,6 +5,7 @@ parser = Parser(
     # Positional values
     [
         String("name"),
+        Int("abcde"),
     ],
 
     # Optional values

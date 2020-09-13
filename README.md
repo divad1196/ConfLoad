@@ -84,6 +84,53 @@ cfg = Config(...).update(...).env(...).load(...)
 
 
 
+## Custom CLi parser
+
+[argparse](https://docs.python.org/3/library/argparse.html), [click](https://click.palletsprojects.com/en/7.x/) and many others are goods, but i found them too complicated for most of the used i had.
+
+Based on those two, here is another parser
+
+```python
+from confload.cli import Parser, SubParser, String, Int, Float, Bool, Toggle, List
+
+
+parser = Parser(
+    # Positional values
+    [
+        String("name"),
+        Int("abcde"),
+    ],
+
+    # Optional values
+    [
+        String("lastname", aliases=["lastname", "l"]),
+        List("children", aliases=["child", "c"]),
+        Toggle("active", aliases=["active", "y"], default=False),
+    ],
+)
+
+
+print(str(parser))
+print(parser.aliases)
+res = parser()
+
+print(res)
+```
+
+Running `python3 test_parser.py -l abcde --child foo,bar --lastname trew -c another -c some,other test 56` we get the following output
+
+```txt
+[OPTIONS] NAME ABCDE
+{'--lastname': lastname, '-l': lastname, '--child': children, '-c': children, '--active': active, '-y': active}
+{'active': False, 'name': 'test', 'abcde': 56, 'lastname': 'trew', 'children': ['foo', 'bar', 'another', 'some', 'other']}
+```
+
+
+
+When we implement a tool, it is usefull to use subparser automaticly calling functions. (This is in progress)
+
+
+
 ## Futur
 
 * add support for argparse

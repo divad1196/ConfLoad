@@ -1,6 +1,6 @@
 import sys
 from . import schema
-from schema import Schema
+from schema import Use
 from pathlib import Path
 
 _sentinelle = object()
@@ -27,12 +27,13 @@ class Argument:
         if aliases is None:
             aliases = [name]
         self.aliases = [ _make_option(alias) for alias in aliases]
-        self.schema = Schema(schema)
+        self.schema = Use(schema)
         self.default = default
         self.need_value = need_value
 
     def __call__(self, values, val):
-        values[self.name] = self.schema.validate(val)
+        res = self.schema.validate(val)
+        values[self.name] = self.schema.validate(res)
 
     def __repr__(self):
         return self.name
@@ -174,7 +175,7 @@ class Parser:
                         alias=opt,
                     ))
             alias(values, val)
-
+        
         defaults.update(values)
         return defaults
 
